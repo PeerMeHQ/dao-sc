@@ -3,8 +3,6 @@
 
 elrond_wasm::imports!();
 
-use config::SEALED_ON;
-
 pub mod config;
 pub mod governance;
 pub mod permission;
@@ -29,21 +27,13 @@ pub trait EntityEsdt:
         }
     }
 
-    #[payable("*")]
-    #[endpoint(seal)]
-    fn seal_endpoint(&self) {
-        let caller = self.blockchain().get_caller();
-        let (proof_token_id, proof_amount) = self.call_value().single_fungible_esdt();
-
-        self.require_not_sealed();
+    #[endpoint(finalize)]
+    fn finalize_endpoint(&self) {
         require!(!self.vote_nft_token().is_empty(), "vote nft token must be set");
-        require!(proof_token_id == self.token().get_token_id(), "invalid token proof");
 
-        self.sealed().set(SEALED_ON);
-        self.send().direct_esdt(&caller, &proof_token_id, 0, &proof_amount);
         self.vote_nft_token().set_local_roles(&[EsdtLocalRole::NftCreate, EsdtLocalRole::NftBurn][..], None);
 
-        // TODO: upgrade token to disallow transferring ownership & remove upgradability with controlChanges
+        // TODO: consider upgrade token to disallow transferring ownership & remove upgradability with controlChanges
     }
 
     #[view(getVersion)]

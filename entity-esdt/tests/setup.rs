@@ -54,7 +54,6 @@ where
                 sc.min_proposal_vote_weight().set(managed_biguint!(MIN_WEIGHT_FOR_PROPOSAL));
                 sc.voting_period_in_minutes().set(VOTING_PERIOD_MINUTES_DEFAULT);
                 sc.vote_nft_token().set_token_id(&managed_token_id!(VOTE_NFT_TOKEN_ID));
-                sc.sealed().set(SEALED_ON);
             })
             .assert_ok();
 
