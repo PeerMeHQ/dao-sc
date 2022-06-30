@@ -1,5 +1,5 @@
 [package]
-name = "manager"
+name = "entity-esdt"
 version = "1.0.0"
 authors = ["Micha Vie <micha@freeiam.com>", "Superciety <hello@superciety.com>"]
 edition = "2018"
@@ -10,9 +10,6 @@ path = "src/lib.rs"
 
 [dependencies.elrond-wasm]
 version = "0.33.1"
-
-[dependencies.entity-esdt]
-path = "../entity-esdt"
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.33.1"

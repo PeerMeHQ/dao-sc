@@ -43,5 +43,5 @@ pub trait FactoryModule: config::ConfigModule + features::FeaturesModule {
     }
 
     #[proxy]
-    fn entity_contract_proxy(&self, to: ManagedAddress) -> entity::Proxy<Self::Api>;
+    fn entity_contract_proxy(&self, to: ManagedAddress) -> entity_esdt::Proxy<Self::Api>;
 }

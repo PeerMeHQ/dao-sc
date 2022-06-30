@@ -1,23 +1,15 @@
 [package]
-name = "manager"
+name = "entity-esdt-meta"
 version = "1.0.0"
 authors = ["Micha Vie <micha@freeiam.com>", "Superciety <hello@superciety.com>"]
 edition = "2018"
 publish = false
 
-[lib]
-path = "src/lib.rs"
+[dependencies.entity-esdt]
+path = ".."
 
 [dependencies.elrond-wasm]
 version = "0.33.1"
 
-[dependencies.entity-esdt]
-path = "../entity-esdt"
-
-[dev-dependencies.elrond-wasm-debug]
+[dependencies.elrond-wasm-debug]
 version = "0.33.1"
-
-[dev-dependencies]
-num-bigint = "0.4.2"
-num-traits = "0.2"
-hex = "0.4"

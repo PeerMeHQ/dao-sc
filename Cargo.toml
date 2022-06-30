@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "entity",
-    "entity/meta",
+    "entity-esdt",
+    "entity-esdt/meta",
     "manager",
     "manager/meta"
 ]

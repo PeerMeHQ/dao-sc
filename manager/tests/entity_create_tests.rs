@@ -16,7 +16,7 @@ fn it_creates_an_entity() {
     setup.blockchain.set_esdt_balance(&caller, COST_TOKEN_ID, &rust_biguint!(5000));
 
     let manager_addr = setup.contract.address_ref().clone();
-    let new_entity_wrapper = setup.blockchain.prepare_deploy_from_sc(&manager_addr, entity::contract_obj);
+    let new_entity_wrapper = setup.blockchain.prepare_deploy_from_sc(&manager_addr, entity_esdt::contract_obj);
 
     setup.blockchain.execute_esdt_transfer(&caller, &setup.contract, COST_TOKEN_ID, 0, &rust_biguint!(1000), |sc| {
         sc.setup_token_id(&managed_address!(&caller)).set(&managed_token_id!(token_id));
