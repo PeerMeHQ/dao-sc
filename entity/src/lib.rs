@@ -26,6 +26,13 @@ pub trait Entity:
         }
     }
 
+    #[endpoint(eject)]
+    fn eject_endpoint(&self, trusted_host_address: ManagedAddress) {
+        self.require_caller_self();
+
+        self.trusted_host_address().set(&trusted_host_address);
+    }
+
     #[payable("EGLD")]
     #[endpoint(registerDns)]
     fn register_dns(&self, dns_address: ManagedAddress, name: ManagedBuffer) {
