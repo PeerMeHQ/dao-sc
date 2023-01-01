@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           53
+// Endpoints:                           52
 // Async Callback:                       1
-// Total number of exported functions:  55
+// Total number of exported functions:  54
 
 #![no_std]
 
@@ -19,7 +19,6 @@ elrond_wasm_node::wasm_endpoints! {
         getVersion
         getTrustedHostAddress
         getGovTokenId
-        getProtectedVoteTokens
         getGuardedVoteTokens
         isLockingVoteTokens
         getProposalIdCounter
