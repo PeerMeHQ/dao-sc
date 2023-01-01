@@ -181,12 +181,6 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule {
                 .with_arguments_raw(ManagedArgBuffer::from(action.arguments))
                 .with_gas_limit(action.gas_limit);
 
-            if action.value > 0 {
-                call = call.with_egld_transfer(action.value);
-                call.transfer_execute();
-                break;
-            }
-
             for payment in action.payments.iter() {
                 if payment.token_identifier == gov_token_id {
                     self.require_gov_tokens_available(&payment.amount, payment.token_nonce);
@@ -195,7 +189,11 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule {
                 call = call.add_esdt_token_transfer(payment.token_identifier, payment.token_nonce, payment.amount);
             }
 
-            call.transfer_execute()
+            if action.value > 0 {
+                call = call.with_egld_transfer(action.value);
+            }
+
+            call.transfer_execute();
         }
     }
 
