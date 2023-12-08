@@ -64,7 +64,7 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
         require!(payment.token_identifier == self.cost_token_id().get(), "invalid token");
         require!(payment.amount > 0, "amount can not be zero");
 
-        self.boost(caller, entity_address, payment.amount.clone());
+        self.boost_by_user(caller, entity_address, payment.amount.clone());
         self.forward_distribution_to_org(payment);
     }
 
@@ -87,18 +87,20 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
 
         let cost_payment = self.swap_wegld_to_cost_tokens(wegld.amount);
 
-        self.boost(caller, entity, cost_payment.amount.clone());
+        self.boost_by_user(caller, entity, cost_payment.amount.clone());
         self.forward_distribution_to_org(cost_payment);
     }
 
     #[endpoint(registerExternalBoost)]
     fn register_external_boost_endpoint(&self, booster: ManagedAddress, entity: ManagedAddress, amount: BigUint) {
-        let caller = self.blockchain().get_caller();
-        let is_trusted_host = caller == self.trusted_host_address().get();
-        let is_owner = caller == self.blockchain().get_owner_address();
-        require!(is_trusted_host || is_owner, "not allowed");
+        self.require_caller_is_admin();
+        self.boost_by_user(booster, entity, amount);
+    }
 
-        self.boost(booster, entity, amount);
+    #[endpoint(boostNoReward)]
+    fn boost_no_reward_endpoint(&self, entity: ManagedAddress, amount: BigUint) {
+        self.require_caller_is_admin();
+        self.direct_boost(&entity, &amount);
     }
 
     #[view(getCredits)]
@@ -120,20 +122,23 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
         bonus_factor
     }
 
-    fn boost(&self, booster: ManagedAddress, entity: ManagedAddress, amount: BigUint) {
-        self.require_entity_exists(&entity);
-
+    fn boost_by_user(&self, booster: ManagedAddress, entity: ManagedAddress, amount: BigUint) {
         let bonus_factor = self.credits_bonus_factor().get();
         let virtual_amount = &amount * &BigUint::from(bonus_factor);
-        let mut entry = self.get_or_create_entry(&entity);
 
-        entry.total_amount += &virtual_amount;
-        entry.period_amount += &virtual_amount;
-
-        self.credits_entries(&entity).set(entry);
+        self.direct_boost(&entity, &virtual_amount);
         self.credits_total_deposits_amount().update(|current| *current += &virtual_amount);
         self.mint_and_send_reward_tokens(&booster, &virtual_amount);
         self.boost_event(booster, entity, amount, virtual_amount, bonus_factor);
+    }
+
+    fn direct_boost(&self, entity: &ManagedAddress, amount: &BigUint) {
+        self.require_entity_exists(&entity);
+        let mut entry = self.get_or_create_entry(&entity);
+        entry.total_amount += amount;
+        entry.period_amount += amount;
+
+        self.credits_entries(&entity).set(entry);
     }
 
     fn recalculate_daily_cost(&self, entity: &ManagedAddress) {

@@ -59,7 +59,7 @@ fn it_fails_when_caller_is_user() {
         .execute_tx(&setup.user_address, &setup.contract, &rust_biguint!(0), |sc| {
             sc.register_external_boost_endpoint(managed_address!(&booster), managed_address!(&entity_address), managed_biguint!(25));
         })
-        .assert_user_error("not allowed");
+        .assert_user_error("caller must be admin");
 }
 
 #[test]
