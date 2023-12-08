@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           31
+// Endpoints:                           32
 // Async Callback (empty):               1
-// Total number of exported functions:  33
+// Total number of exported functions:  34
 
 #![no_std]
 
@@ -42,10 +42,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         setCreditsBonusFactor => set_credits_bonus_factor_endpoint
         setCreditsCostBase => set_credits_cost_base_endpoint
         setCreditsCostExtraPercent => set_credits_cost_extra_percent_endpoint
-        setDailyFeatureCost => set_credits_cost_feature_amount_endpoint
+        setCreditsCostFeature => set_credits_cost_feature_amount_endpoint
         boost => boost_endpoint
         boostWithSwap => boost_with_swap_endpoint
         registerExternalBoost => register_external_boost_endpoint
+        boostNoReward => boost_no_reward_endpoint
         getCredits => get_credits_view
         getCreditsInfo => get_credits_info_view
         getBaseDailyCost => credits_cost_base_amount
