@@ -116,7 +116,7 @@ pub trait PermissionModule: config::ConfigModule + plug::PlugModule {
 
     /// Create a policy that allows permissions to be invoked unilaterally.
     /// Can only be called by the contract itself.
-    #[endpoint(createPolicyForOne)]
+    #[endpoint(createPolicyOne)]
     fn create_policy_one_endpoint(&self, role_name: ManagedBuffer, permission_name: ManagedBuffer) {
         self.require_caller_self();
         self.create_policy(role_name, permission_name, PolicyMethod::One, BigUint::from(1u64), 0);
@@ -124,7 +124,7 @@ pub trait PermissionModule: config::ConfigModule + plug::PlugModule {
 
     /// Create a policy that requires all role members to sign in order to invoke the permission.
     /// Can only be called by the contract itself.
-    #[endpoint(createPolicyForAll)]
+    #[endpoint(createPolicyAll)]
     fn create_policy_all_endpoint(&self, role_name: ManagedBuffer, permission_name: ManagedBuffer) {
         self.require_caller_self();
         self.create_policy(role_name, permission_name, PolicyMethod::All, BigUint::zero(), self.voting_period_in_minutes().get());
