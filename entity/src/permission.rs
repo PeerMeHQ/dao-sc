@@ -28,6 +28,7 @@ pub enum PolicyMethod {
     One,
     All,
     Quorum,
+    Majority,
 }
 
 impl PolicyMethod {
@@ -37,6 +38,7 @@ impl PolicyMethod {
             PolicyMethod::One => b"one",
             PolicyMethod::All => b"all",
             PolicyMethod::Quorum => b"quorum",
+            PolicyMethod::Majority => b"majority",
         }
     }
 }
@@ -138,6 +140,20 @@ pub trait PermissionModule: config::ConfigModule + plug::PlugModule {
             permission_name,
             PolicyMethod::Quorum,
             BigUint::from(quorum),
+            self.voting_period_in_minutes().get(),
+        );
+    }
+
+    /// Create a policy that requires role members to reach a majority in order to invoke the permission.
+    /// Can only be called by the contract itself.
+    #[endpoint(createPolicyMajority)]
+    fn create_policy_majority_endpoint(&self, role_name: ManagedBuffer, permission_name: ManagedBuffer) {
+        self.require_caller_self();
+        self.create_policy(
+            role_name,
+            permission_name,
+            PolicyMethod::Majority,
+            BigUint::zero(),
             self.voting_period_in_minutes().get(),
         );
     }
