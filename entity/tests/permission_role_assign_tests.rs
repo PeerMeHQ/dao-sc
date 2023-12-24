@@ -1,6 +1,6 @@
-use multiversx_sc_scenario::*;
 use entity::config::*;
 use entity::permission::*;
+use multiversx_sc_scenario::*;
 use setup::*;
 
 mod setup;
@@ -63,7 +63,7 @@ fn it_only_increases_role_member_count_once_per_assigned_user() {
 }
 
 #[test]
-fn it_must_call_itself() {
+fn it_fails_when_caller_not_self() {
     let mut setup = EntitySetup::new(entity::contract_obj);
     let user_address = &setup.user_address;
 
