@@ -214,6 +214,7 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule + 
                             PolicyMethod::One => self.proposal_signers(proposal.id, &role).contains(&proposer_id),
                             PolicyMethod::All => self.proposal_signers(proposal.id, &role).len() >= self.roles_member_amount(&role).get(),
                             PolicyMethod::Quorum => BigUint::from(self.proposal_signers(proposal.id, &role).len()) >= policy.quorum,
+                            PolicyMethod::Majority => self.has_signer_majority_for_role(&proposal, &role),
                         }
                     } else {
                         // If no specific policy is set, fallback to checking for a signer majority.
