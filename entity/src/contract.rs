@@ -90,14 +90,14 @@ pub trait ContractModule:
         let gas = self.blockchain().get_gas_left();
         let value = BigUint::zero();
 
+        self.unique_ids().insert(unique_id);
+        self.stage_lock(&address).clear();
+
         if address.is_zero() {
             self.send_raw().deploy_contract(gas, &value, &code, code_metadata, &args_buffer);
         } else {
             self.send_raw().upgrade_contract(&address, gas, &value, &code, code_metadata, &args_buffer);
         }
-
-        self.unique_ids().insert(unique_id);
-        self.stage_lock(&address).clear();
     }
 
     #[view(getContractStage)]
