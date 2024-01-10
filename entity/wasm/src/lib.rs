@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           69
+// Endpoints:                           70
 // Async Callback:                       1
-// Total number of exported functions:  71
+// Total number of exported functions:  72
 
 #![no_std]
 
@@ -53,9 +53,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         unassignRole => unassign_role_endpoint
         createPermission => create_permission_endpoint
         createPolicyWeighted => create_policy_weighted_endpoint
-        createPolicyForOne => create_policy_one_endpoint
-        createPolicyForAll => create_policy_all_endpoint
+        createPolicyOne => create_policy_one_endpoint
+        createPolicyAll => create_policy_all_endpoint
         createPolicyQuorum => create_policy_quorum_endpoint
+        createPolicyMajority => create_policy_majority_endpoint
         getUserRoles => get_user_roles_view
         getPermissions => get_permissions_view
         getPolicies => get_policies_view
