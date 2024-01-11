@@ -1,6 +1,6 @@
+use entity::permission::*;
 use multiversx_sc::types::*;
 use multiversx_sc_scenario::*;
-use entity::permission::*;
 use setup::*;
 
 mod setup;
@@ -18,7 +18,8 @@ fn it_creates_a_permission() {
                 managed_biguint!(0),
                 managed_address!(sc_address),
                 managed_buffer!(b"endpoint"),
-                MultiValueManagedVec::new(),
+                ManagedVec::new(),
+                ManagedVec::new(),
             );
 
             assert!(sc.permissions().contains(&managed_buffer!(b"testperm")));
