@@ -20,17 +20,16 @@ pub trait Entity:
     + governance::token::TokenModule
 {
     #[init]
-    fn init(&self, trusted_host_address: ManagedAddress, opt_leader: OptionalValue<ManagedAddress>) {
+    fn init(&self, trusted_host_address: ManagedAddress, leader: ManagedAddress) {
         self.trusted_host_address().set(&trusted_host_address);
         self.init_governance_module();
-
-        if let OptionalValue::Some(leader) = opt_leader {
-            self.init_permission_module(leader);
-        }
+        self.init_permission_module(leader);
     }
 
     #[endpoint]
-    fn upgrade(&self) {}
+    fn upgrade(&self, trusted_host_address: ManagedAddress) {
+        self.trusted_host_address().set(&trusted_host_address);
+    }
 
     #[endpoint(changeVoteTokenLock)]
     fn change_vote_token_lock_endpoint(&self, token: TokenIdentifier, lock: bool) {
