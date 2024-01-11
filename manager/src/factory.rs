@@ -14,7 +14,7 @@ pub trait FactoryModule: config::ConfigModule + events::EventsModule {
 
         let (address, _) = self
             .entity_contract_proxy(ManagedAddress::zero())
-            .init(trusted_host_address, OptionalValue::Some(leader))
+            .init(trusted_host_address, leader)
             .deploy_from_source::<()>(&template_contract, self.get_deploy_code_metadata());
 
         require!(!address.is_zero(), "address is zero");
@@ -28,11 +28,15 @@ pub trait FactoryModule: config::ConfigModule + events::EventsModule {
         require!(!self.trusted_host_address().is_empty(), "trusted host address needs to be configured");
 
         let trusted_host_address = self.trusted_host_address().get();
-        let template_contract = self.get_template_address();
+        let template = self.get_template_address();
+        let gas = self.blockchain().get_gas_left();
+        let metadata = self.get_deploy_code_metadata();
 
-        self.entity_contract_proxy(address.clone())
-            .init(trusted_host_address, OptionalValue::<ManagedAddress>::None)
-            .upgrade_from_source(&template_contract, self.get_deploy_code_metadata());
+        let mut args = ManagedArgBuffer::new();
+        args.push_arg(trusted_host_address);
+
+        self.send_raw()
+            .upgrade_from_source_contract(&address, gas, &BigUint::zero(), &template, metadata, &args);
 
         self.entity_upgraded_event(address);
     }
