@@ -20,6 +20,14 @@ pub trait ConfigModule {
         self.entity_templ_address().get()
     }
 
+    #[endpoint(setEntityTemplateAddress)]
+    fn set_entity_template_address_endpoint(&self, address: ManagedAddress) {
+        self.require_caller_is_admin();
+        require!(self.blockchain().is_smart_contract(&address), "must be contract");
+
+        self.entity_templ_address().set(&address);
+    }
+
     #[endpoint(setEntityCreationCost)]
     fn set_entity_creation_cost_endpoint(&self, amount: BigUint) {
         self.require_caller_is_admin();

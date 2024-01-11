@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           32
+// Endpoints:                           33
 // Async Callback (empty):               1
-// Total number of exported functions:  34
+// Total number of exported functions:  35
 
 #![no_std]
 
@@ -30,6 +30,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         createEntity => create_entity_endpoint
         upgradeEntity => upgrade_entity_endpoint
         setFeatures => set_features_endpoint
+        setEntityTemplateAddress => set_entity_template_address_endpoint
         setEntityCreationCost => set_entity_creation_cost_endpoint
         getAdmins => admins
         getEntities => entities
