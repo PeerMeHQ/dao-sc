@@ -31,3 +31,24 @@ fn it_creates_a_permission() {
         })
         .assert_ok();
 }
+
+#[test]
+fn it_fails_when_caller_not_self() {
+    let mut setup = EntitySetup::new(entity::contract_obj);
+    let user_address = &setup.user_address;
+    let sc_address = setup.contract.address_ref();
+
+    setup
+        .blockchain
+        .execute_tx(&user_address, &setup.contract, &rust_biguint!(0), |sc| {
+            sc.create_permission_endpoint(
+                managed_buffer!(b"testperm"),
+                managed_biguint!(0),
+                managed_address!(sc_address),
+                managed_buffer!(b"endpoint"),
+                ManagedVec::new(),
+                ManagedVec::new(),
+            );
+        })
+        .assert_user_error("action not allowed by user");
+}
