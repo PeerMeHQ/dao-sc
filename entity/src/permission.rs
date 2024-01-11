@@ -93,17 +93,11 @@ pub trait PermissionModule: config::ConfigModule + plug::PlugModule {
         value: BigUint,
         destination: ManagedAddress,
         endpoint: ManagedBuffer,
-        payments_multi: MultiValueManagedVec<EsdtTokenPaymentMultiValue>,
+        args: ManagedVec<ManagedBuffer>,
+        payments: ManagedVec<EsdtTokenPayment>,
     ) {
         self.require_caller_self();
-
-        let mut payments = ManagedVec::new();
-
-        for payment in payments_multi.iter() {
-            payments.push(payment.into_esdt_token_payment());
-        }
-
-        self.create_permission(permission_name, value, destination, endpoint, ManagedVec::new(), payments);
+        self.create_permission(permission_name, value, destination, endpoint, args, payments);
     }
 
     /// Create a policy that requires role members to vote based on the provided parameters in order to invoke the permission.
