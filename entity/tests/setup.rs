@@ -49,7 +49,7 @@ where
 
         blockchain
             .execute_tx(&owner_address, &contract, &rust_zero, |sc| {
-                sc.init(managed_address!(&trusted_host_address), OptionalValue::Some(managed_address!(&owner_address)));
+                sc.init(managed_address!(&trusted_host_address), managed_address!(&owner_address));
 
                 // disable trusted host for tests
                 sc.trusted_host_address().clear();
