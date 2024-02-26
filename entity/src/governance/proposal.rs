@@ -455,8 +455,6 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule + 
     }
 
     fn does_permission_apply_to_action(&self, permission_details: &PermissionDetails<Self::Api>, action: &Action<Self::Api>) -> bool {
-        let mut is_pure_value_perm = true;
-
         // check value/EGLD mismatch
         if permission_details.value != 0 && action.value > permission_details.value {
             return false;
@@ -468,12 +466,8 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule + 
         }
 
         // check endpoint mismatch
-        if !permission_details.endpoint.is_empty() {
-            is_pure_value_perm = false;
-
-            if action.endpoint != permission_details.endpoint {
-                return false;
-            }
+        if !permission_details.endpoint.is_empty() && action.endpoint != permission_details.endpoint {
+            return false;
         }
 
         // check arguments mismatch. ignored if permission contains no arguments.
@@ -482,8 +476,6 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule + 
         //      - fails: arg1, arg2 (permission) -> arg1, arg3 (action)
         //      - fails: arg1, arg2 (permission) -> arg1 (action)
         if !permission_details.arguments.is_empty() {
-            is_pure_value_perm = false;
-
             for (i, perm_arg) in permission_details.arguments.into_iter().enumerate() {
                 if let Option::Some(arg_at_index) = action.arguments.try_get(i).as_deref() {
                     let applies = arg_at_index == &perm_arg;
@@ -500,8 +492,6 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule + 
         // check payments mismatch. ignored if permission contains no payments.
         // returns false, if a payment is not in the permissions or exceeds payment amount.
         if !permission_details.payments.is_empty() {
-            is_pure_value_perm = false;
-
             let applies = action.payments.into_iter().all(|payment| {
                 if let Some(guard) = permission_details.payments.into_iter().find(|p| p.token_identifier == payment.token_identifier) {
                     payment.amount <= guard.amount
@@ -513,12 +503,6 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule + 
             if !applies {
                 return false;
             }
-        }
-
-        // ensure that pure value transfer permissions are
-        // not applied to smart contract calls with 0 value.
-        if is_pure_value_perm && action.value == 0 {
-            return false;
         }
 
         true
