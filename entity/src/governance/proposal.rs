@@ -515,12 +515,6 @@ pub trait ProposalModule: config::ConfigModule + permission::PermissionModule + 
             }
         }
 
-        // ensure that pure value transfer permissions are
-        // not applied to smart contract calls with 0 value.
-        if is_pure_value_perm && action.value == 0 {
-            return false;
-        }
-
         true
     }
 
