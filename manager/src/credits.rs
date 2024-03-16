@@ -61,7 +61,7 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
     fn boost_endpoint(&self, entity_address: ManagedAddress) {
         let caller = self.blockchain().get_caller();
         let payment = self.call_value().single_esdt();
-        require!(payment.token_identifier == self.cost_token_id().get(), "invalid token");
+        require!(payment.token_identifier == self.native_token().get(), "invalid token");
         require!(payment.amount > 0, "amount can not be zero");
 
         self.boost_by_user(caller, entity_address, payment.amount.clone());
@@ -73,7 +73,7 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
     fn boost_with_swap_endpoint(&self, entity: ManagedAddress, swap_contract_opt: OptionalValue<ManagedAddress>) {
         let (payment_token, payment_amount) = self.call_value().egld_or_single_fungible_esdt();
         let caller = self.blockchain().get_caller();
-        let cost_token_id = self.cost_token_id().get();
+        let cost_token_id = self.native_token().get();
 
         require!(payment_token.is_valid(), "invalid token");
         require!(payment_amount > 0, "amount can not be zero");

@@ -37,7 +37,7 @@ pub trait DexModule: config::ConfigModule {
     }
 
     fn swap_wegld_to_cost_tokens(&self, amount: BigUint) -> EsdtTokenPayment {
-        let cost_token_id = self.cost_token_id().get();
+        let cost_token_id = self.native_token().get();
         let wegld_token_id = self.wegld_token_id().get();
         let cost_token_wegld_swap_contract = self.cost_token_wegld_swap_contract().get();
 

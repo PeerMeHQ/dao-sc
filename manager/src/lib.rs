@@ -21,15 +21,17 @@ pub trait Manager:
     + organization::OrganizationModule
 {
     #[init]
-    fn init(&self, entity_template_address: ManagedAddress, trusted_host_address: ManagedAddress, cost_token: TokenIdentifier, cost_entity_creation: BigUint) {
+    fn init(&self, entity_template_address: ManagedAddress, trusted_host_address: ManagedAddress, native_token: TokenIdentifier, cost_entity_creation: BigUint) {
         self.entity_templ_address().set(&entity_template_address);
         self.trusted_host_address().set(&trusted_host_address);
-        self.cost_token_id().set(&cost_token);
+        self.native_token().set(&native_token);
         self.cost_creation_amount().set(&cost_entity_creation);
     }
 
     #[endpoint]
-    fn upgrade(&self) {}
+    fn upgrade(&self, native_token: TokenIdentifier) {
+        self.native_token().set(&native_token);
+    }
 
     #[endpoint(addAdmin)]
     fn add_admin_endpoint(&self, address: ManagedAddress) {
@@ -56,22 +58,23 @@ pub trait Manager:
         require!(!ticket_id.is_empty(), "ticket id is required");
     }
 
-    #[payable("*")]
+    #[payable("EGLD")]
     #[endpoint(createEntity)]
     fn create_entity_endpoint(&self, features: MultiValueManagedVec<ManagedBuffer>) -> ManagedAddress {
-        let payment = self.call_value().single_esdt();
-
-        require!(payment.token_identifier == self.cost_token_id().get(), "invalid cost token");
-        require!(payment.amount >= self.cost_creation_amount().get(), "invalid cost amount");
+        let payment_amount = self.call_value().egld_value().clone_value();
+        require!(payment_amount >= self.cost_creation_amount().get(), "invalid cost amount");
 
         let caller = self.blockchain().get_caller();
         let entity_address = self.create_entity();
 
+        self.wrap_egld(payment_amount.clone());
+        let native_cost = self.swap_wegld_to_cost_tokens(payment_amount.clone());
+
         self.entities().insert(entity_address.clone());
         self.set_features(&entity_address, features.into_vec());
         self.recalculate_daily_cost(&entity_address);
-        self.boost_by_user(caller, entity_address.clone(), payment.amount.clone());
-        self.forward_payment_to_org(EgldOrEsdtTokenPayment::from(payment));
+        self.boost_by_user(caller, entity_address.clone(), payment_amount.clone());
+        self.forward_payment_to_org(EgldOrEsdtTokenPayment::from(native_cost));
 
         entity_address
     }

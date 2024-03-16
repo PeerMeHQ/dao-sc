@@ -72,7 +72,7 @@ fn it_initializes_the_contract() {
     setup
         .blockchain
         .execute_query(&setup.contract, |sc| {
-            assert_eq!(managed_token_id!(COST_TOKEN_ID), sc.cost_token_id().get());
+            assert_eq!(managed_token_id!(COST_TOKEN_ID), sc.native_token().get());
         })
         .assert_ok();
 }
