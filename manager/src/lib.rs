@@ -68,7 +68,7 @@ pub trait Manager:
         let entity_address = self.create_entity();
 
         self.wrap_egld(payment_amount.clone());
-        let native_cost = self.swap_wegld_to_cost_tokens(payment_amount.clone());
+        let native_cost = self.swap_wegld_to_native_tokens(payment_amount.clone());
 
         self.entities().insert(entity_address.clone());
         self.set_features(&entity_address, features.into_vec());
