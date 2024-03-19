@@ -19,10 +19,10 @@ pub struct CreditEntry<M: ManagedTypeApi> {
 pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::DexModule + organization::OrganizationModule + events::EventsModule {
     #[only_owner]
     #[endpoint(initCreditsModule)]
-    fn init_credits_module(&self, boost_reward_token_id: TokenIdentifier, bonus_factor: u8) {
-        self.credits_reward_token().set(boost_reward_token_id);
-
+    fn init_credits_module(&self, boost_reward_token: TokenIdentifier, bonus_factor: u8) {
         require!(bonus_factor > 0, "bonus factor can not be zero");
+
+        self.credits_reward_token().set(boost_reward_token);
         self.credits_bonus_factor().set(bonus_factor);
     }
 
@@ -58,37 +58,34 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
 
     #[payable("*")]
     #[endpoint(boost)]
-    fn boost_endpoint(&self, entity_address: ManagedAddress) {
-        let caller = self.blockchain().get_caller();
-        let payment = self.call_value().single_esdt();
-        require!(payment.token_identifier == self.cost_token_id().get(), "invalid token");
-        require!(payment.amount > 0, "amount can not be zero");
-
-        self.boost_by_user(caller, entity_address, payment.amount.clone());
-        self.forward_distribution_to_org(payment);
-    }
-
-    #[payable("*")]
-    #[endpoint(boostWithSwap)]
-    fn boost_with_swap_endpoint(&self, entity: ManagedAddress, swap_contract_opt: OptionalValue<ManagedAddress>) {
+    fn boost_endpoint(&self, entity: ManagedAddress, swap_contract_opt: OptionalValue<ManagedAddress>) {
         let (payment_token, payment_amount) = self.call_value().egld_or_single_fungible_esdt();
         let caller = self.blockchain().get_caller();
-        let cost_token_id = self.cost_token_id().get();
 
-        require!(payment_token.is_valid(), "invalid token");
+        require!(payment_token.is_valid(), "invalid token id");
         require!(payment_amount > 0, "amount can not be zero");
-        require!(payment_token != cost_token_id, "no swap needed - call boost endpoint directly");
 
+        // payment in stable token : 1 cent = 1 credit
+        if payment_token == self.stable_token().get() {
+            let esdt_payment = self.call_value().single_esdt();
+
+            self.boost_by_user(caller, entity, esdt_payment.amount.clone());
+            self.forward_distribution_to_org(esdt_payment);
+
+            return;
+        }
+
+        // swap to stable for energy determination
         let wegld = if payment_token.is_egld() {
             self.wrap_egld(payment_amount)
         } else {
             self.swap_tokens_to_wegld(payment_token.unwrap_esdt(), payment_amount, swap_contract_opt.into_option().unwrap())
         };
 
-        let cost_payment = self.swap_wegld_to_cost_tokens(wegld.amount);
+        let swapped_payment = self.swap_wegld_to_stable_tokens(wegld.amount);
 
-        self.boost_by_user(caller, entity, cost_payment.amount.clone());
-        self.forward_distribution_to_org(cost_payment);
+        self.boost_by_user(caller, entity, swapped_payment.amount.clone());
+        self.forward_distribution_to_org(swapped_payment);
     }
 
     #[endpoint(registerExternalBoost)]

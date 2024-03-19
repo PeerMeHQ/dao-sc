@@ -4,7 +4,7 @@ GOV_TOKEN_ID=""
 
 PROXY=$(mxpy data load --partition $NETWORK_NAME --key=proxy)
 CHAIN_ID=$(mxpy data load --partition $NETWORK_NAME --key=chain-id)
-COST_TOKEN_ID=$(mxpy data load --partition $NETWORK_NAME --key=cost-token-id)
+NATIVE_TOKEN=$(mxpy data load --partition $NETWORK_NAME --key=native-token-id)
 
 # params:
 #   $1 = content hash

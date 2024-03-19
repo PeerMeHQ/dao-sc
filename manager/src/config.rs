@@ -51,9 +51,9 @@ pub trait ConfigModule {
     #[storage_mapper("trusted_host_addr")]
     fn trusted_host_address(&self) -> SingleValueMapper<ManagedAddress>;
 
-    #[view(getCostTokenId)]
-    #[storage_mapper("cost_token")]
-    fn cost_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    #[view(getNativeToken)]
+    #[storage_mapper("native_token")]
+    fn native_token(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[view(getEntityCreationCost)]
     #[storage_mapper("cost_creation_amount")]

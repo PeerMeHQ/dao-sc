@@ -11,11 +11,11 @@ fn it_recalculates_to_daily_base_cost_when_no_features_set() {
     let mut setup = setup::setup_manager(manager::contract_obj);
     let entity_address = setup.contract_entity_template.address_ref();
 
-    setup.blockchain.set_esdt_balance(&entity_address, COST_TOKEN_ID, &rust_biguint!(100));
+    setup.blockchain.set_esdt_balance(&entity_address, NATIVE_TOKEN, &rust_biguint!(100));
 
     setup
         .blockchain
-        .execute_esdt_transfer(&entity_address, &setup.contract, COST_TOKEN_ID, 0, &rust_biguint!(50), |sc| {
+        .execute_esdt_transfer(&entity_address, &setup.contract, NATIVE_TOKEN, 0, &rust_biguint!(50), |sc| {
             sc.entities().insert(managed_address!(&entity_address));
 
             sc.credits_cost_base_amount().set(managed_biguint!(20));
@@ -56,11 +56,11 @@ fn it_recalculates_daily_cost_with_features() {
     let mut setup = setup::setup_manager(manager::contract_obj);
     let entity_address = setup.contract_entity_template.address_ref();
 
-    setup.blockchain.set_esdt_balance(&entity_address, COST_TOKEN_ID, &rust_biguint!(100));
+    setup.blockchain.set_esdt_balance(&entity_address, NATIVE_TOKEN, &rust_biguint!(100));
 
     setup
         .blockchain
-        .execute_esdt_transfer(&entity_address, &setup.contract, COST_TOKEN_ID, 0, &rust_biguint!(50), |sc| {
+        .execute_esdt_transfer(&entity_address, &setup.contract, NATIVE_TOKEN, 0, &rust_biguint!(50), |sc| {
             sc.entities().insert(managed_address!(&entity_address));
 
             sc.credits_cost_base_amount().set(managed_biguint!(20));
