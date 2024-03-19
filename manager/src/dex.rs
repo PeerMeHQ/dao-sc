@@ -46,17 +46,17 @@ pub trait DexModule: config::ConfigModule {
     }
 
     fn swap_wegld_to_native_tokens(&self, amount: BigUint) -> EsdtTokenPayment {
-        let cost_token_id = self.native_token().get();
+        let NATIVE_TOKEN = self.native_token().get();
         let wegld_token_id = self.wegld_token().get();
         let native_token_pair_contract = self.native_token_pair_contract().get();
 
         let swap_output: dex_pair_proxy::SwapTokensFixedInputResultType<Self::Api> = self
             .dex_pair_contract_proxy(native_token_pair_contract)
-            .swap_tokens_fixed_input(cost_token_id.clone(), BigUint::from(1u32))
+            .swap_tokens_fixed_input(NATIVE_TOKEN.clone(), BigUint::from(1u32))
             .with_esdt_transfer(EsdtTokenPayment::new(wegld_token_id, 0, amount))
             .execute_on_dest_context();
 
-        require!(swap_output.token_identifier == cost_token_id, "swapped invalid cost token");
+        require!(swap_output.token_identifier == NATIVE_TOKEN, "swapped invalid cost token");
 
         swap_output
     }

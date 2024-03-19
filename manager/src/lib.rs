@@ -68,13 +68,13 @@ pub trait Manager:
         let entity_address = self.create_entity();
 
         self.wrap_egld(payment_amount.clone());
-        let native_cost = self.swap_wegld_to_native_tokens(payment_amount.clone());
+        let swapped_payment = self.swap_wegld_to_stable_tokens(payment_amount.clone());
 
         self.entities().insert(entity_address.clone());
         self.set_features(&entity_address, features.into_vec());
         self.recalculate_daily_cost(&entity_address);
-        self.boost_by_user(caller, entity_address.clone(), payment_amount.clone());
-        self.forward_payment_to_org(EgldOrEsdtTokenPayment::from(native_cost));
+        self.boost_by_user(caller, entity_address.clone(), swapped_payment.amount.clone());
+        self.forward_payment_to_org(EgldOrEsdtTokenPayment::from(swapped_payment));
 
         entity_address
     }

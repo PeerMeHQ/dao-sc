@@ -62,19 +62,30 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
         let (payment_token, payment_amount) = self.call_value().egld_or_single_fungible_esdt();
         let caller = self.blockchain().get_caller();
 
-        require!(payment_token.is_valid(), "invalid token");
+        require!(payment_token.is_valid(), "invalid token id");
         require!(payment_amount > 0, "amount can not be zero");
 
+        // payment in stable token : 1 cent = 1 credit
+        if payment_token == self.stable_token().get() {
+            let esdt_payment = self.call_value().single_esdt();
+
+            self.boost_by_user(caller, entity, esdt_payment.amount.clone());
+            self.forward_distribution_to_org(esdt_payment);
+
+            return;
+        }
+
+        // swap to stable for energy determination
         let wegld = if payment_token.is_egld() {
             self.wrap_egld(payment_amount)
         } else {
             self.swap_tokens_to_wegld(payment_token.unwrap_esdt(), payment_amount, swap_contract_opt.into_option().unwrap())
         };
 
-        let cost_payment = self.swap_wegld_to_native_tokens(wegld.amount);
+        let swapped_payment = self.swap_wegld_to_stable_tokens(wegld.amount);
 
-        self.boost_by_user(caller, entity, cost_payment.amount.clone());
-        self.forward_distribution_to_org(cost_payment);
+        self.boost_by_user(caller, entity, swapped_payment.amount.clone());
+        self.forward_distribution_to_org(swapped_payment);
     }
 
     #[endpoint(registerExternalBoost)]

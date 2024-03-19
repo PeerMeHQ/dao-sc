@@ -7,7 +7,7 @@ MANAGER_DEPLOY_TRANSACTION=$(mxpy data load --partition $NETWORK_NAME --key=mana
 PROXY=$(mxpy data load --partition $NETWORK_NAME --key=proxy)
 CHAIN_ID=$(mxpy data load --partition $NETWORK_NAME --key=chain-id)
 TRUSTED_HOST_ADDRESS=$(mxpy data load --partition $NETWORK_NAME --key=trusted-host-address)
-COST_TOKEN_ID=$(mxpy data load --partition $NETWORK_NAME --key=cost-token-id)
+NATIVE_TOKEN=$(mxpy data load --partition $NETWORK_NAME --key=native-token-id)
 COST_ENTITY_CREATION_AMOUNT=$(mxpy data load --partition $NETWORK_NAME --key=cost-entity-creation-amount)
 COST_DAILY_BASE_AMOUNT=$(mxpy data load --partition $NETWORK_NAME --key=cost-daily-base-amount)
 DEX_WEGLD_TOKEN_ID=$(mxpy data load --partition $NETWORK_NAME --key=dex-wegld-token-id)
@@ -43,7 +43,7 @@ deploy() {
     sleep 6
 
     mxpy contract deploy --project manager \
-        --arguments $ENTITY_ADDRESS $TRUSTED_HOST_ADDRESS "str:$COST_TOKEN_ID" $COST_ENTITY_CREATION_AMOUNT \
+        --arguments $ENTITY_ADDRESS $TRUSTED_HOST_ADDRESS "str:$NATIVE_TOKEN" $COST_ENTITY_CREATION_AMOUNT \
         --recall-nonce --gas-limit=80000000 \
         --outfile="deploy-$NETWORK_NAME-manager.interaction.json" \
         --proxy=$PROXY --chain=$CHAIN_ID \
@@ -82,7 +82,7 @@ upgrade() {
     cargo test || return
 
     mxpy contract upgrade $MANAGER_ADDRESS --project manager \
-        --arguments $ENTITY_ADDRESS $TRUSTED_HOST_ADDRESS "str:$COST_TOKEN_ID" $COST_ENTITY_CREATION_AMOUNT \
+        --arguments $ENTITY_ADDRESS $TRUSTED_HOST_ADDRESS "str:$NATIVE_TOKEN" $COST_ENTITY_CREATION_AMOUNT \
         --metadata-payable \
         --metadata-payable-by-sc \
         --recall-nonce --gas-limit=100000000 \
@@ -192,7 +192,7 @@ setDailyFeatureCost() {
 createEntity() {
     mxpy contract call $MANAGER_ADDRESS \
         --function="ESDTTransfer" \
-        --arguments "str:$COST_TOKEN_ID" $COST_ENTITY_CREATION_AMOUNT "str:createEntity" \
+        --arguments "str:$NATIVE_TOKEN" $COST_ENTITY_CREATION_AMOUNT "str:createEntity" \
         --recall-nonce --gas-limit=80000000 \
         --proxy=$PROXY --chain=$CHAIN_ID \
         "${SNIPPETS_SECURE_SIGN_METHOD[@]}" \
@@ -205,7 +205,7 @@ createEntity() {
 boost() {
     mxpy contract call $MANAGER_ADDRESS \
         --function="ESDTTransfer" \
-        --arguments "str:$COST_TOKEN_ID" $2 "str:boost" $1 \
+        --arguments "str:$NATIVE_TOKEN" $2 "str:boost" $1 \
         --recall-nonce --gas-limit=80000000 \
         --proxy=$PROXY --chain=$CHAIN_ID \
         "${SNIPPETS_SECURE_SIGN_METHOD[@]}" \

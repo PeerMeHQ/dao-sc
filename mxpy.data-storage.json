@@ -2,7 +2,7 @@
   "devnet": {
     "proxy": "https://devnet-gateway.multiversx.com",
     "chain-id": "D",
-    "cost-token-id": "DSUPER-9af8df",
+    "native-token-id": "DSUPER-9af8df",
     "cost-entity-creation-amount": 1000000000000000000,
     "cost-daily-base-amount": 150000000000000000000,
     "trusted-host-address": "erd1aum55fcd44xfrwelsdma7j5avp263jwrkmr48en0arezkc72hsnq42qa7q",
@@ -20,7 +20,7 @@
   "testnet": {
     "proxy": "https://testnet-gateway.multiversx.com",
     "chain-id": "T",
-    "cost-token-id": "XSUPER-c19331",
+    "native-token-id": "XSUPER-c19331",
     "cost-entity-creation-amount": 1000000000000000000,
     "cost-daily-base-amount": 150000000000000000000,
     "trusted-host-address": "erd1aum55fcd44xfrwelsdma7j5avp263jwrkmr48en0arezkc72hsnq42qa7q",
@@ -38,7 +38,7 @@
   "mainnet": {
     "proxy": "https://gateway.multiversx.com",
     "chain-id": "1",
-    "cost-token-id": "SUPER-507aa6",
+    "native-token-id": "SUPER-507aa6",
     "cost-entity-creation-amount": 500000000000000000000,
     "cost-daily-base-amount": 150000000000000000000,
     "trusted-host-address": "erd1lqxznlr3umq0g0h3cfmjqngespx2wfymjcmuvrgrthd3gdzryf8s3gtlt3",
