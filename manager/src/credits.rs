@@ -7,6 +7,8 @@ use crate::organization;
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
+const REWARD_ADJUSTMENT_DECIMAL_EXPONENT: u32 = 12;
+
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct CreditEntry<M: ManagedTypeApi> {
     pub total_amount: BigUint<M>,
@@ -188,8 +190,10 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
 
     fn mint_and_send_reward_tokens(&self, address: &ManagedAddress, amount: &BigUint) {
         let reward_token = self.credits_reward_token().get();
-        self.send().esdt_local_mint(&reward_token, 0, &amount);
-        self.send().direct_esdt(&address, &reward_token, 0, &amount);
+        let reward_amount = amount * &BigUint::from(10u64).pow(REWARD_ADJUSTMENT_DECIMAL_EXPONENT);
+
+        self.send().esdt_local_mint(&reward_token, 0, &reward_amount);
+        self.send().direct_esdt(&address, &reward_token, 0, &reward_amount);
     }
 
     #[storage_mapper("credits:entries")]
