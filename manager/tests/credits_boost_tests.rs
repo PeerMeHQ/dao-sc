@@ -20,9 +20,9 @@ fn it_increases_deposited_amounts_in_the_storage() {
 
             let actual = sc.credits_entries(&managed_address!(&entity_address)).get();
 
-            assert_eq!(managed_biguint!(50), actual.total_amount);
-            assert_eq!(managed_biguint!(50), actual.period_amount);
-            assert_eq!(managed_biguint!(50), sc.credits_total_deposits_amount().get());
+            assert_eq!(managed_biguint!(50_00_000000000000), actual.total_amount);
+            assert_eq!(managed_biguint!(50_00_000000000000), actual.period_amount);
+            assert_eq!(managed_biguint!(50_00_000000000000), sc.credits_total_deposits_amount().get());
         })
         .assert_ok();
 
@@ -33,9 +33,9 @@ fn it_increases_deposited_amounts_in_the_storage() {
 
             let actual = sc.credits_entries(&managed_address!(&entity_address)).get();
 
-            assert_eq!(managed_biguint!(75), actual.total_amount);
-            assert_eq!(managed_biguint!(75), actual.period_amount);
-            assert_eq!(managed_biguint!(75), sc.credits_total_deposits_amount().get());
+            assert_eq!(managed_biguint!(75_00_000000000000), actual.total_amount);
+            assert_eq!(managed_biguint!(75_00_000000000000), actual.period_amount);
+            assert_eq!(managed_biguint!(75_00_000000000000), sc.credits_total_deposits_amount().get());
         })
         .assert_ok();
 }

@@ -7,7 +7,8 @@ use crate::organization;
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-const REWARD_ADJUSTMENT_DECIMAL_EXPONENT: u32 = 12;
+const REWARD_ADJUSTMENT_DECIMAL_EXPONENT: u32 = 12; // difference between stable token decimals (6) and reward token decimals (18)
+const CREDITS_STABLE_AMOUNT_FACTOR: u32 = 100; // 1 credit = 1 cent
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct CreditEntry<M: ManagedTypeApi> {
@@ -70,8 +71,9 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
         // payment in stable token : 1 cent = 1 credit
         if payment_token == self.stable_token().get() {
             let esdt_payment = self.call_value().single_esdt();
+            let credits = self.convert_stable_amount_to_credits(&esdt_payment.amount);
 
-            self.boost_by_user(caller, entity, esdt_payment.amount.clone());
+            self.boost_by_user(caller, entity, credits);
             self.forward_distribution_to_org(esdt_payment);
 
             return;
@@ -85,8 +87,9 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
         };
 
         let swapped_payment = self.swap_wegld_to_stable_tokens(wegld.amount);
+        let credits = self.convert_stable_amount_to_credits(&swapped_payment.amount);
 
-        self.boost_by_user(caller, entity, swapped_payment.amount.clone());
+        self.boost_by_user(caller, entity, credits);
         self.forward_distribution_to_org(swapped_payment);
     }
 
@@ -121,6 +124,11 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
         bonus_factor
     }
 
+    #[inline]
+    fn convert_stable_amount_to_credits(&self, amount: &BigUint) -> BigUint {
+        amount * &BigUint::from(CREDITS_STABLE_AMOUNT_FACTOR) * &BigUint::from(10u64).pow(REWARD_ADJUSTMENT_DECIMAL_EXPONENT)
+    }
+
     fn boost_by_user(&self, booster: ManagedAddress, entity: ManagedAddress, amount: BigUint) {
         let bonus_factor = self.credits_bonus_factor().get();
         let virtual_amount = &amount * &BigUint::from(bonus_factor);
@@ -153,8 +161,8 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
         }
 
         entry.daily_cost = if base_extra_percent > 0 {
-            let extra_cost = &daily_cost * &BigUint::from(base_extra_percent) / &BigUint::from(10000u64);
-            &daily_cost + &extra_cost
+            let extra_cost = &daily_cost * &BigUint::from(base_extra_percent) / &BigUint::from(100_00u64);
+            daily_cost + extra_cost
         } else {
             daily_cost
         };
@@ -190,10 +198,8 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
 
     fn mint_and_send_reward_tokens(&self, address: &ManagedAddress, amount: &BigUint) {
         let reward_token = self.credits_reward_token().get();
-        let reward_amount = amount * &BigUint::from(10u64).pow(REWARD_ADJUSTMENT_DECIMAL_EXPONENT);
-
-        self.send().esdt_local_mint(&reward_token, 0, &reward_amount);
-        self.send().direct_esdt(&address, &reward_token, 0, &reward_amount);
+        self.send().esdt_local_mint(&reward_token, 0, &amount);
+        self.send().direct_esdt(&address, &reward_token, 0, &amount);
     }
 
     #[storage_mapper("credits:entries")]
