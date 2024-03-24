@@ -114,6 +114,15 @@ pub trait CreditsModule: config::ConfigModule + dex::DexModule + organization::O
         self.recalculate_daily_cost(&caller_entity);
     }
 
+    #[endpoint(forceDisableFeature)]
+    fn disable_feature_endpoint(&self, entity: ManagedAddress, feature: ManagedBuffer) {
+        self.require_caller_is_admin();
+        self.require_entity_exists(&entity);
+
+        self.disable_feature(&entity, feature);
+        self.recalculate_daily_cost(&entity);
+    }
+
     #[view(getCredits)]
     fn get_credits_view(&self, entity_address: ManagedAddress) -> MultiValue2<BigUint, BigUint> {
         if self.credits_entries(&entity_address).is_empty() {
