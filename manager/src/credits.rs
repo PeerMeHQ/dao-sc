@@ -1,7 +1,6 @@
 use crate::config;
 use crate::dex;
 use crate::events;
-use crate::features;
 use crate::organization;
 
 multiversx_sc::imports!();
@@ -19,7 +18,7 @@ pub struct CreditEntry<M: ManagedTypeApi> {
 }
 
 #[multiversx_sc::module]
-pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::DexModule + organization::OrganizationModule + events::EventsModule {
+pub trait CreditsModule: config::ConfigModule + dex::DexModule + organization::OrganizationModule + events::EventsModule {
     #[only_owner]
     #[endpoint(initCreditsModule)]
     fn init_credits_module(&self, boost_reward_token: TokenIdentifier, bonus_factor: u8) {
@@ -103,6 +102,16 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
     fn boost_no_reward_endpoint(&self, entity: ManagedAddress, amount: BigUint) {
         self.require_caller_is_admin();
         self.direct_boost(&entity, &amount);
+    }
+
+    #[endpoint(setFeatures)]
+    fn set_features_endpoint(&self, features: MultiValueManagedVec<ManagedBuffer>) {
+        let caller_entity = self.blockchain().get_caller();
+        let features = features.into_vec();
+
+        self.require_entity_exists(&caller_entity);
+        self.set_features(&caller_entity, features);
+        self.recalculate_daily_cost(&caller_entity);
     }
 
     #[view(getCredits)]
@@ -202,6 +211,22 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
         self.send().direct_esdt(&address, &reward_token, 0, &amount);
     }
 
+    fn set_features(&self, entity_address: &ManagedAddress, features: ManagedVec<ManagedBuffer>) {
+        self.features(&entity_address).clear();
+
+        for feature in features.into_iter() {
+            self.enable_feature(&entity_address, feature);
+        }
+    }
+
+    fn enable_feature(&self, entity_address: &ManagedAddress, feature: ManagedBuffer) {
+        self.features(&entity_address).insert(feature);
+    }
+
+    fn disable_feature(&self, entity_address: &ManagedAddress, feature: ManagedBuffer) {
+        self.features(&entity_address).swap_remove(&feature);
+    }
+
     #[storage_mapper("credits:entries")]
     fn credits_entries(&self, entity_address: &ManagedAddress) -> SingleValueMapper<CreditEntry<Self::Api>>;
 
@@ -225,4 +250,8 @@ pub trait CreditsModule: config::ConfigModule + features::FeaturesModule + dex::
 
     #[storage_mapper("credits:bonus_factor")]
     fn credits_bonus_factor(&self) -> SingleValueMapper<u8>;
+
+    #[view(getFeatures)]
+    #[storage_mapper("credits:features")]
+    fn features(&self, entity_address: &ManagedAddress) -> UnorderedSetMapper<ManagedBuffer>;
 }

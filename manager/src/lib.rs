@@ -7,18 +7,11 @@ pub mod credits;
 pub mod dex;
 pub mod events;
 pub mod factory;
-pub mod features;
 pub mod organization;
 
 #[multiversx_sc::contract]
 pub trait Manager:
-    config::ConfigModule
-    + features::FeaturesModule
-    + factory::FactoryModule
-    + credits::CreditsModule
-    + events::EventsModule
-    + dex::DexModule
-    + organization::OrganizationModule
+    config::ConfigModule + factory::FactoryModule + credits::CreditsModule + events::EventsModule + dex::DexModule + organization::OrganizationModule
 {
     #[init]
     fn init(&self, entity_template_address: ManagedAddress, trusted_host_address: ManagedAddress, native_token: TokenIdentifier, cost_entity_creation: BigUint) {
@@ -84,15 +77,5 @@ pub trait Manager:
         self.require_entity_exists(&entity_address);
         self.recalculate_daily_cost(&entity_address);
         self.upgrade_entity(entity_address);
-    }
-
-    #[endpoint(setFeatures)]
-    fn set_features_endpoint(&self, features: MultiValueManagedVec<ManagedBuffer>) {
-        let caller_entity_address = self.blockchain().get_caller();
-        let features = features.into_vec();
-
-        self.require_entity_exists(&caller_entity_address);
-        self.set_features(&caller_entity_address, features);
-        self.recalculate_daily_cost(&caller_entity_address);
     }
 }
