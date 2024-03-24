@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           34
+// Endpoints:                           35
 // Async Callback (empty):               1
-// Total number of exported functions:  36
+// Total number of exported functions:  37
 
 #![no_std]
 #![allow(internal_features)]
@@ -27,7 +27,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         executeTicket => execute_ticket_endpoint
         createEntity => create_entity_endpoint
         upgradeEntity => upgrade_entity_endpoint
-        setFeatures => set_features_endpoint
         setEntityTemplateAddress => set_entity_template_address_endpoint
         setEntityCreationCost => set_entity_creation_cost_endpoint
         getAdmins => admins
@@ -36,7 +35,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         getTrustedHostAddress => trusted_host_address
         getNativeToken => native_token
         getEntityCreationCost => cost_creation_amount
-        getFeatures => features
         initCreditsModule => init_credits_module
         setCreditsBonusFactor => set_credits_bonus_factor_endpoint
         setCreditsCostBase => set_credits_cost_base_endpoint
@@ -45,11 +43,14 @@ multiversx_sc_wasm_adapter::endpoints! {
         boost => boost_endpoint
         registerExternalBoost => register_external_boost_endpoint
         boostNoReward => boost_no_reward_endpoint
+        setFeatures => set_features_endpoint
+        forceDisableFeature => disable_feature_endpoint
         getCredits => get_credits_view
         getCreditsInfo => get_credits_info_view
         getBaseDailyCost => credits_cost_base_amount
         getBaseExtraPercent => credits_cost_extra_percent
         getCreditsCostFeature => credits_cost_feature_amount
+        getFeatures => features
         initDexModule => init_dex_module
         getStableToken => stable_token
         getStablePairContract => stable_token_pair_contract
