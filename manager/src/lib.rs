@@ -22,9 +22,7 @@ pub trait Manager:
     }
 
     #[endpoint]
-    fn upgrade(&self, native_token: TokenIdentifier) {
-        self.native_token().set(&native_token);
-    }
+    fn upgrade(&self) {}
 
     #[endpoint(addAdmin)]
     fn add_admin_endpoint(&self, address: ManagedAddress) {
