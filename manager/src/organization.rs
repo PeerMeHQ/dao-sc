@@ -16,7 +16,7 @@ pub trait OrganizationModule: config::ConfigModule {
         }
 
         self.org_contract_proxy(self.org_contract_address().get())
-            .distribute_endpoint()
+            .deposit_endpoint()
             .with_egld_or_single_esdt_transfer(EgldOrEsdtTokenPayment::from(payment))
             .execute_on_dest_context::<()>();
     }
