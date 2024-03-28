@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           35
+// Endpoints:                           38
 // Async Callback (empty):               1
-// Total number of exported functions:  37
+// Total number of exported functions:  40
 
 #![no_std]
 #![allow(internal_features)]
@@ -45,12 +45,15 @@ multiversx_sc_wasm_adapter::endpoints! {
         boostNoReward => boost_no_reward_endpoint
         setFeatures => set_features_endpoint
         forceDisableFeature => disable_feature_endpoint
+        setVoucherCollection => set_voucher_collection
+        redeemVoucher => redeem_voucher_endpoint
         getCredits => get_credits_view
         getCreditsInfo => get_credits_info_view
         getBaseDailyCost => credits_cost_base_amount
         getBaseExtraPercent => credits_cost_extra_percent
         getCreditsCostFeature => credits_cost_feature_amount
         getFeatures => features
+        getVoucherCollection => voucher_collection
         initDexModule => init_dex_module
         getStableToken => stable_token
         getStablePairContract => stable_token_pair_contract

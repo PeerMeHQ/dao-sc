@@ -123,6 +123,28 @@ pub trait CreditsModule: config::ConfigModule + dex::DexModule + organization::O
         self.recalculate_daily_cost(&entity);
     }
 
+    #[endpoint(setVoucherCollection)]
+    fn set_voucher_collection(&self, collection: TokenIdentifier) {
+        self.require_caller_is_admin();
+
+        self.voucher_collection().set(&collection);
+    }
+
+    #[payable("*")]
+    #[endpoint(redeemVoucher)]
+    fn redeem_voucher_endpoint(&self) {
+        let caller = self.blockchain().get_caller();
+        let payment = self.call_value().single_esdt();
+        let voucher_collection = self.voucher_collection().get();
+
+        require!(payment.token_identifier == voucher_collection, "not a valid voucher");
+        require!(payment.amount == BigUint::from(1u32), "can only redeem one at a time");
+
+        self.send().esdt_local_burn(&payment.token_identifier, payment.token_nonce, &payment.amount);
+
+        self.voucher_redeemed_event(caller, payment.token_nonce);
+    }
+
     #[view(getCredits)]
     fn get_credits_view(&self, entity_address: ManagedAddress) -> MultiValue2<BigUint, BigUint> {
         if self.credits_entries(&entity_address).is_empty() {
@@ -263,4 +285,8 @@ pub trait CreditsModule: config::ConfigModule + dex::DexModule + organization::O
     #[view(getFeatures)]
     #[storage_mapper("credits:features")]
     fn features(&self, entity_address: &ManagedAddress) -> UnorderedSetMapper<ManagedBuffer>;
+
+    #[view(getVoucherCollection)]
+    #[storage_mapper("credits:voucher_collection")]
+    fn voucher_collection(&self) -> SingleValueMapper<TokenIdentifier>;
 }
